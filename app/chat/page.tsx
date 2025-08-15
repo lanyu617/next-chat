@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useRouter } from 'next/navigation';
 
@@ -28,7 +28,7 @@ export default function ChatPage() {
     ? sessions.find((s) => s.id === activeSessionId)
     : null;
 
-  const createNewSessionBackend = async () => {
+  const createNewSessionBackend = useCallback(async () => {
     const token = localStorage.getItem('token');
     if (!token) {
       router.push('/login');
@@ -64,7 +64,7 @@ export default function ChatPage() {
     } catch (error) {
       console.error('Error creating new session:', error);
     }
-  };
+  }, [sessions.length, router, fetchMessagesForSession, setSessions, setActiveSessionId, setIsLoggedIn]);
 
   // Helper to fetch messages for a given session
   const fetchMessagesForSession = async (sessionId: string, token: string) => {
