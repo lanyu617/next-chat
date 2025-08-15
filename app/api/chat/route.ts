@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // import { marked } from 'marked'; // Remove marked import
 import OpenAI from "openai";
 import { verifyToken } from '../../../lib/auth'; // Import verifyToken
-import { pool } from '../../../../lib/db'; // Import pool
+import { pool } from '../../../lib/db'; // Import pool
 
 const openai = new OpenAI({
   baseURL: 'https://api.deepseek.com',
