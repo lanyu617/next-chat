@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { pool } from '../../../../lib/db';
-import { verifyToken } from '../../lib/auth';
+import { pool } from '../../../lib/db';
+import { verifyToken } from '../../../lib/auth';
 
 // Get all sessions for a user
 export async function GET(req: NextRequest) {
