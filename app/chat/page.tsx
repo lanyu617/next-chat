@@ -28,6 +28,31 @@ export default function ChatPage() {
     ? sessions.find((s) => s.id === activeSessionId)
     : null;
 
+  // Helper to fetch messages for a given session
+  const fetchMessagesForSession = useCallback(async (sessionId: string, token: string) => {
+    try {
+      const response = await fetch(`/api/chat?sessionId=${sessionId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data;
+      } else if (response.status === 401) {
+        localStorage.removeItem('token');
+        setIsLoggedIn(false);
+        router.push('/login');
+      } else {
+        console.error(`Failed to fetch messages for session ${sessionId}`, response.statusText);
+        return [];
+      }
+    } catch (error) {
+      console.error(`Error fetching messages for session ${sessionId}:`, error);
+      return [];
+    }
+  }, [router, setIsLoggedIn]);
+
   const createNewSessionBackend = useCallback(async () => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -65,31 +90,6 @@ export default function ChatPage() {
       console.error('Error creating new session:', error);
     }
   }, [sessions.length, router, fetchMessagesForSession, setSessions, setActiveSessionId, setIsLoggedIn]);
-
-  // Helper to fetch messages for a given session
-  const fetchMessagesForSession = useCallback(async (sessionId: string, token: string) => {
-    try {
-      const response = await fetch(`/api/chat?sessionId=${sessionId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        return data;
-      } else if (response.status === 401) {
-        localStorage.removeItem('token');
-        setIsLoggedIn(false);
-        router.push('/login');
-      } else {
-        console.error(`Failed to fetch messages for session ${sessionId}`, response.statusText);
-        return [];
-      }
-    } catch (error) {
-      console.error(`Error fetching messages for session ${sessionId}:`, error);
-      return [];
-    }
-  }, [router, setIsLoggedIn]);
 
   const fetchStreamedData = async (userMessage: string) => {
     if (!activeSession) {
