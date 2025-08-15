@@ -38,9 +38,13 @@ export async function GET(req: NextRequest) {
     );
 
     return NextResponse.json(messagesResult.rows, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching messages:', error);
-    return NextResponse.json({ message: error.message || 'Internal server error' }, { status: error.message.includes('token') ? 401 : 500 });
+    let errorMessage = 'Internal server error';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+    return NextResponse.json({ message: errorMessage }, { status: (error instanceof Error && errorMessage.includes('token')) ? 401 : 500 });
   }
 }
 
@@ -112,9 +116,13 @@ export async function POST(req: NextRequest) {
     return new NextResponse(customReadable, {
       headers: { 'Content-Type': 'text/plain' },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Handle token verification errors or other top-level errors
     console.error('Chat API error:', error);
-    return NextResponse.json({ message: error.message || 'Internal server error' }, { status: error.message.includes('token') ? 401 : 500 });
+    let errorMessage = 'Internal server error';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+    return NextResponse.json({ message: errorMessage }, { status: (error instanceof Error && errorMessage.includes('token')) ? 401 : 500 });
   }
 }

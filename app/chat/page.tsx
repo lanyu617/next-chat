@@ -230,7 +230,7 @@ export default function ChatPage() {
     };
 
     fetchSessions();
-  }, [router]);
+  }, [router, createNewSessionBackend]);
 
   // Scroll to the bottom whenever messages in the active session change
   useEffect(() => {

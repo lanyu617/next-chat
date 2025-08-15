@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import jwt from 'jsonwebtoken';
 
 interface DecodedToken {
@@ -19,7 +19,7 @@ export const verifyToken = (req: NextRequest): DecodedToken => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as DecodedToken;
     return decoded;
-  } catch (error) {
+  } catch {
     throw new Error('Invalid token');
   }
 };

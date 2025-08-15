@@ -14,9 +14,13 @@ export async function GET(req: NextRequest) {
     );
 
     return NextResponse.json(sessionsResult.rows, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching sessions:', error);
-    return NextResponse.json({ message: error.message || 'Internal server error' }, { status: 500 });
+    let errorMessage = 'Internal server error';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+    return NextResponse.json({ message: errorMessage }, { status: 500 });
   }
 }
 
@@ -37,9 +41,13 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json(newSessionResult.rows[0], { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error creating session:', error);
-    return NextResponse.json({ message: error.message || 'Internal server error' }, { status: 500 });
+    let errorMessage = 'Internal server error';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+    return NextResponse.json({ message: errorMessage }, { status: 500 });
   }
 }
 
