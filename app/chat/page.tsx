@@ -67,7 +67,7 @@ export default function ChatPage() {
   }, [sessions.length, router, fetchMessagesForSession, setSessions, setActiveSessionId, setIsLoggedIn]);
 
   // Helper to fetch messages for a given session
-  const fetchMessagesForSession = async (sessionId: string, token: string) => {
+  const fetchMessagesForSession = useCallback(async (sessionId: string, token: string) => {
     try {
       const response = await fetch(`/api/chat?sessionId=${sessionId}`, {
         headers: {
@@ -89,7 +89,7 @@ export default function ChatPage() {
       console.error(`Error fetching messages for session ${sessionId}:`, error);
       return [];
     }
-  };
+  }, [router, setIsLoggedIn]);
 
   const fetchStreamedData = async (userMessage: string) => {
     if (!activeSession) {
