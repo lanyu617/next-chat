@@ -97,7 +97,7 @@ export default function LoginPage() {
         </Form.Item>
       </Form>
       <p className="mt-4">
-        Don't have an account? <a href="/register" className="text-blue-500 hover:underline">Register here</a>
+        Don&apos;t have an account? <a href="/register" className="text-blue-500 hover:underline">Register here</a>
       </p>
     </div>
   );

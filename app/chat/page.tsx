@@ -2,7 +2,7 @@
 
 import { Button, Input, List } from 'antd'; // Import Ant Design List
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons'; // Import icons
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react'; // Add useCallback
 import ReactMarkdown from 'react-markdown';
 import { useRouter } from 'next/navigation';
 
@@ -31,7 +31,7 @@ export default function ChatPage() {
     : null;
 
   // Helper to fetch messages for a given session
-  const fetchMessagesForSession = async (sessionId: string, token: string) => {
+  const fetchMessagesForSession = useCallback(async (sessionId: string, token: string) => {
     try {
       const response = await fetch(`/api/chat?sessionId=${sessionId}`, {
         headers: {
@@ -45,6 +45,7 @@ export default function ChatPage() {
         localStorage.removeItem('token');
         setIsLoggedIn(false);
         router.push('/login');
+        return [];
       } else {
         console.error(`Failed to fetch messages for session ${sessionId}`, response.statusText);
         return [];
@@ -53,9 +54,9 @@ export default function ChatPage() {
       console.error(`Error fetching messages for session ${sessionId}:`, error);
       return [];
     }
-  };
+  }, [router, setIsLoggedIn]); // Dependencies for useCallback
 
-  const createNewSessionBackend = async () => {
+  const createNewSessionBackend = useCallback(async () => {
     const token = localStorage.getItem('token');
     if (!token) {
       router.push('/login');
@@ -91,7 +92,7 @@ export default function ChatPage() {
     } catch (error) {
       console.error('Error creating new session:', error);
     }
-  };
+  }, [sessions.length, router, fetchMessagesForSession, setSessions, setActiveSessionId, setIsLoggedIn]); // Dependencies for useCallback
 
   const fetchStreamedData = async (userMessage: string) => {
     if (!activeSession) {
@@ -232,7 +233,7 @@ export default function ChatPage() {
     };
 
     fetchSessions();
-  }, [router, createNewSessionBackend]);
+  }, [router, createNewSessionBackend, setIsLoggedIn]); // Add setIsLoggedIn to dependencies
 
   // Scroll to the bottom whenever messages in the active session change
   useEffect(() => {
