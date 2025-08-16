@@ -223,9 +223,53 @@ export default function ChatPage() {
     setIsModalVisible(true);
   };
 
-  const handleOk = () => {
-    // Implement update logic here later
-    setIsModalVisible(false);
+  const handleOk = async () => {
+    if (!activeSession) return;
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/sessions', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ id: activeSession.id, title: editingTitle }),
+      });
+
+      if (response.ok) {
+        const updatedSession = await response.json();
+        // Update sessions state with the new title
+        setSessions((prevSessions) =>
+          prevSessions.map((s) =>
+            s.id === updatedSession.id ? { ...s, title: updatedSession.title } : s
+          )
+        );
+        setIsModalVisible(false);
+      } else if (response.status === 401) {
+        const errorData = await response.json();
+        if (errorData.message === 'Token expired') {
+          localStorage.removeItem('token');
+          setIsLoggedIn(false);
+          router.push('/login?message=expired');
+        } else {
+          localStorage.removeItem('token');
+          setIsLoggedIn(false);
+          router.push('/login');
+        }
+      } else {
+        console.error('Failed to update session title', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error updating session title:', error);
+      localStorage.removeItem('token');
+      setIsLoggedIn(false);
+      router.push('/login');
+    }
   };
 
   const handleCancel = () => {
