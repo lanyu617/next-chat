@@ -1,7 +1,7 @@
 'use client';
 
-import { Button, Input, List } from 'antd'; // Import Ant Design List
-import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons'; // Import icons
+import { Button, Input, List, Modal } from 'antd'; // Import Modal
+import { MenuFoldOutlined, MenuUnfoldOutlined, EditOutlined } from '@ant-design/icons'; // Import EditOutlined
 import { useState, useEffect, useRef, useCallback } from 'react'; // Add useCallback
 import ReactMarkdown from 'react-markdown';
 import { useRouter } from 'next/navigation';
@@ -24,6 +24,8 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false); // State for modal visibility
+  const [editingTitle, setEditingTitle] = useState(''); // State for editing title
   const router = useRouter();
 
   const activeSession = activeSessionId
@@ -213,6 +215,23 @@ export default function ChatPage() {
     router.push('/login');
   };
 
+  // Function to show modal and set initial editing title
+  const showEditModal = () => {
+    if (activeSession) {
+      setEditingTitle(activeSession.title);
+    }
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    // Implement update logic here later
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
   // Fetch sessions on component mount and handle authentication
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -348,6 +367,14 @@ export default function ChatPage() {
             <h1 className="text-xl font-semibold">
               {activeSession ? activeSession.title : 'Loading...'}
             </h1>
+            {activeSession && (
+              <Button
+                type="text"
+                icon={<EditOutlined />}
+                onClick={showEditModal}
+                style={{ marginLeft: '8px' }}
+              />
+            )}
           </div>
           {isLoggedIn ? (
             <Button type="primary" danger onClick={handleLogout}>
@@ -359,6 +386,28 @@ export default function ChatPage() {
             </Button>
           )}
         </header>
+
+        {/* Edit Title Modal */}
+        <Modal
+          title="Edit Session Title"
+          open={isModalVisible}
+          onOk={handleOk}
+          onCancel={handleCancel}
+          footer={[
+            <Button key="back" onClick={handleCancel}>
+              Cancel
+            </Button>,
+            <Button key="submit" type="primary" onClick={handleOk}>
+              OK
+            </Button>,
+          ]}
+        >
+          <Input
+            value={editingTitle}
+            onChange={(e) => setEditingTitle(e.target.value)}
+            placeholder="New Session Title"
+          />
+        </Modal>
 
         {/* Message Area */}
         <div className="flex-1 p-4 overflow-y-auto bg-gray-50 flex flex-col" ref={messagesEndRef}>
