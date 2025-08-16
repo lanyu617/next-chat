@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { Button, Input, List } from 'antd'; // Import Ant Design List
+import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons'; // Import icons
+import { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useRouter } from 'next/navigation';
 
@@ -29,7 +31,7 @@ export default function ChatPage() {
     : null;
 
   // Helper to fetch messages for a given session
-  const fetchMessagesForSession = useCallback(async (sessionId: string, token: string) => {
+  const fetchMessagesForSession = async (sessionId: string, token: string) => {
     try {
       const response = await fetch(`/api/chat?sessionId=${sessionId}`, {
         headers: {
@@ -51,9 +53,9 @@ export default function ChatPage() {
       console.error(`Error fetching messages for session ${sessionId}:`, error);
       return [];
     }
-  }, [router, setIsLoggedIn]);
+  };
 
-  const createNewSessionBackend = useCallback(async () => {
+  const createNewSessionBackend = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
       router.push('/login');
@@ -89,7 +91,7 @@ export default function ChatPage() {
     } catch (error) {
       console.error('Error creating new session:', error);
     }
-  }, [sessions.length, router, fetchMessagesForSession, setSessions, setActiveSessionId, setIsLoggedIn]);
+  };
 
   const fetchStreamedData = async (userMessage: string) => {
     if (!activeSession) {
@@ -252,37 +254,37 @@ export default function ChatPage() {
         className={`bg-gray-100 transition-all duration-300 ${isSidebarOpen ? 'w-64 p-4' : 'w-0 p-0 overflow-hidden'}`}
       >
         <h2 className="text-xl font-semibold mb-4">Sessions</h2>
-        <nav>
-          <ul>
-            {sessions.map((session) => (
-              <li key={session.id} className="mb-2">
-                <a
-                  href="#"
-                  onClick={async () => {
-                    setActiveSessionId(session.id);
-                    const token = localStorage.getItem('token');
-                    if (token) {
-                      const fetchedMessages = await fetchMessagesForSession(session.id, token);
-                      setSessions((prevSessions) =>
-                        prevSessions.map((s) =>
-                          s.id === session.id ? { ...s, messages: fetchedMessages } : s
-                        )
-                      );
-                    }
-                  }}
-                  className={`block p-2 rounded ${activeSessionId === session.id ? 'bg-blue-300 text-white' : 'hover:bg-gray-200'}`}
-                >
-                  {session.title}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <button
+        <div className="flex-1 overflow-y-auto">
+          <List
+            dataSource={sessions}
+            renderItem={(session) => (
+              <List.Item
+                key={session.id}
+                className={`${activeSessionId === session.id ? 'bg-blue-300 text-white' : 'hover:bg-gray-200'}`}
+                style={{ cursor: 'pointer', padding: '8px 12px', borderRadius: '4px' }}
+                onClick={async () => {
+                  setActiveSessionId(session.id);
+                  const token = localStorage.getItem('token');
+                  if (token) {
+                    const fetchedMessages = await fetchMessagesForSession(session.id, token);
+                    setSessions((prevSessions) =>
+                      prevSessions.map((s) =>
+                        s.id === session.id ? { ...s, messages: fetchedMessages } : s
+                      )
+                    );
+                  }
+                }}
+              >
+                {session.title}
+              </List.Item>
+            )}
+          />
+        </div>
+        <Button
+          type="primary"
           onClick={async () => {
             const newSession = await createNewSessionBackend();
             if (newSession) {
-              // Fetch messages for the newly created session (should be empty)
               const token = localStorage.getItem('token');
               if (token) {
                 const fetchedMessages = await fetchMessagesForSession(newSession.id, token);
@@ -294,56 +296,45 @@ export default function ChatPage() {
               }
             }
           }}
-          className="mt-4 p-3 bg-green-600 text-white rounded-md w-full hover:bg-green-700 transition duration-300 ease-in-out shadow-md cursor-pointer"
+          style={{ width: '100%', marginTop: '16px' }}
         >
-          + 新会话
-        </button>
+          + New Session
+        </Button>
       </aside>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-gray-50">
+      <div className="flex-1 flex flex-col">
         {/* Header */}
         <header className="bg-white p-4 flex items-center justify-between">
           <div className="flex items-center">
-            <button
+            <Button
+              type="text"
+              icon={isSidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="mr-4 p-2 rounded bg-gray-300"
-            >
-              {isSidebarOpen ? '☰' : '▶'}
-            </button>
+              style={{ marginRight: '16px' }}
+            />
             <h1 className="text-xl font-semibold">
               {activeSession ? activeSession.title : 'Loading...'}
             </h1>
           </div>
           {isLoggedIn ? (
-            <button
-              onClick={handleLogout}
-              className="p-2 bg-red-300 text-white rounded"
-            >
+            <Button type="primary" danger onClick={handleLogout}>
               Logout
-            </button>
+            </Button>
           ) : (
-            <button
-              onClick={() => router.push('/login')}
-              className="p-2 bg-blue-500 text-white rounded"
-            >
+            <Button type="primary" onClick={() => router.push('/login')}>
               Login
-            </button>
+            </Button>
           )}
         </header>
 
         {/* Message Area */}
-        <div className="flex-1 p-6 overflow-y-auto flex flex-col space-y-4" ref={messagesEndRef}>
-          {!activeSessionId && (
-            <div className="flex-1 flex items-center justify-center text-gray-500 text-lg">
-              <p>请选择一个会话或创建新会话开始对话。</p>
-            </div>
-          )}
-          {activeSessionId && activeSession?.messages && activeSession.messages.map((msg, index) => (
+        <div className="flex-1 p-4 overflow-y-auto bg-gray-50 flex flex-col" ref={messagesEndRef}>
+          {activeSession?.messages.map((msg, index) => (
             <div
               key={index}
-              className={`p-4 rounded-xl shadow-md ${msg.sender === 'user' ? 'bg-blue-500 text-white self-end rounded-br-none' : 'bg-gray-200 text-gray-800 self-start rounded-bl-none'}`}
-              style={{ maxWidth: '80%' }}
+              className={`mb-2 p-2 rounded shadow-sm ${msg.sender === 'user' ? 'bg-blue-100 self-end' : 'bg-white self-start'}`}
+              style={{ maxWidth: '70%', marginLeft: msg.sender === 'user' ? 'auto' : 'unset' }}
             >
               <ReactMarkdown>{msg.content}</ReactMarkdown>
             </div>
@@ -351,25 +342,22 @@ export default function ChatPage() {
         </div>
 
         {/* Input Box */}
-        <div className="p-4 bg-gray-200 flex items-stretch shadow-inner">
-          <input
-            type="text"
-            placeholder="输入你的消息..."
-            className="flex-1 p-3 border-2 border-gray-300 rounded-l-lg focus:outline-none focus:border-blue-500 transition duration-200 ease-in-out text-lg"
+        <div className="p-4 bg-gray-200 flex">
+          <Input.TextArea
+            placeholder="Type your message..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                handleSendMessage();
-              }
+            onPressEnter={(e) => {
+              if (e.shiftKey) return; // Allow shift + enter for new line
+              e.preventDefault(); // Prevent default new line
+              handleSendMessage();
             }}
+            autoSize={{ minRows: 1, maxRows: 5 }}
+            style={{ marginRight: '8px' }}
           />
-          <button
-            onClick={handleSendMessage}
-            className="p-3 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600 transition duration-300 ease-in-out cursor-pointer font-semibold flex-shrink-0"
-          >
-            发送
-          </button>
+          <Button type="primary" onClick={handleSendMessage}>
+            Send
+          </Button>
         </div>
       </div>
     </div>

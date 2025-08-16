@@ -1,12 +1,13 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Button, Input, Form } from 'antd'; // Import Ant Design components
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
-  const [passwordError, setPasswordError] = useState(''); // New state for password error
+  const [passwordError, setPasswordError] = useState('');
   const router = useRouter();
 
   const validatePassword = (pwd: string) => {
@@ -19,13 +20,12 @@ export default function LoginPage() {
     return true;
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLogin = async () => {
     setMessage('');
     setPasswordError('');
 
     if (!validatePassword(password)) {
-      return; // Stop if password format is invalid
+      return;
     }
 
     try {
@@ -40,9 +40,9 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('token', data.token); // Store JWT
+        localStorage.setItem('token', data.token);
         setMessage(data.message || 'Login successful!');
-        router.push('/chat'); // Redirect to chat page after successful login
+        router.push('/chat');
       } else {
         setMessage(data.message || 'Login failed.');
       }
@@ -53,43 +53,52 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100 p-4">
-      <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
-        <h1 className="text-4xl font-extrabold text-center mb-6 text-gray-800">欢迎回来！</h1>
-        <p className="text-center text-gray-600 mb-8">登录 NextChat 继续对话</p>
-        <form onSubmit={handleLogin} className="flex flex-col gap-5">
-          <input
-            type="text"
-            placeholder="用户名"
-            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200 ease-in-out text-lg"
+    <div className="flex min-h-screen flex-col items-center justify-center p-24">
+      <h1>Login to NextChat</h1>
+      <Form onFinish={handleLogin} className="flex flex-col gap-4 mt-8 w-80">
+        <Form.Item
+          name="username"
+          rules={[{ required: true, message: 'Please input your Username!' }]}
+        >
+          <Input
+            placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            required
           />
-          <input
-            type="password"
-            placeholder="密码"
-            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200 ease-in-out text-lg"
+        </Form.Item>
+        <Form.Item
+          name="password"
+          rules={[
+            { required: true, message: 'Please input your Password!' },
+            () => ({
+              validator(_, value) {
+                if (!value || validatePassword(value)) {
+                  return Promise.resolve();
+                }
+                return Promise.reject(new Error(passwordError || 'Password format is invalid.'));
+              },
+            }),
+          ]}
+        >
+          <Input.Password
+            placeholder="Password"
             value={password}
             onChange={(e) => {
               setPassword(e.target.value);
-              validatePassword(e.target.value); // Real-time validation
+              validatePassword(e.target.value);
             }}
-            required
           />
-          {passwordError && <p className="text-red-500 text-sm mt-1">{passwordError}</p>} {/* Error message */}
-          <button
-            type="submit"
-            className="w-full p-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold rounded-md hover:from-blue-600 hover:to-blue-700 transition duration-300 ease-in-out shadow-lg text-lg"
-          >
-            登录
-          </button>
-        </form>
-        {message && <p className="mt-6 text-center text-red-500 font-medium">{message}</p>}
-        <p className="mt-6 text-center text-gray-700 text-base">
-          还没有账户？ <a href="/register" className="text-blue-600 hover:underline font-semibold">立即注册</a>
-        </p>
-      </div>
+        </Form.Item>
+        {message && <p className="mt-4 text-center text-red-500">{message}</p>}
+        <Form.Item>
+          <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
+            Login
+          </Button>
+        </Form.Item>
+      </Form>
+      <p className="mt-4">
+        Don't have an account? <a href="/register" className="text-blue-500 hover:underline">Register here</a>
+      </p>
     </div>
   );
 }
