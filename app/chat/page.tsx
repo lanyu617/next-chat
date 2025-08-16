@@ -351,14 +351,14 @@ export default function ChatPage() {
         </div>
 
         {/* Input Box */}
-        <div className="p-4 bg-gray-200 flex items-center shadow-inner">
+        <div className="p-4 bg-gray-200 flex items-stretch shadow-inner">
           <input
             type="text"
             placeholder="输入你的消息..."
-            className="flex-1 p-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200 ease-in-out text-lg"
+            className="flex-1 p-3 border-2 border-gray-300 rounded-l-lg focus:outline-none focus:border-blue-500 transition duration-200 ease-in-out text-lg"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => {
+            onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 handleSendMessage();
               }
@@ -366,7 +366,7 @@ export default function ChatPage() {
           />
           <button
             onClick={handleSendMessage}
-            className="p-3 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600 transition duration-300 ease-in-out cursor-pointer font-semibold"
+            className="p-3 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600 transition duration-300 ease-in-out cursor-pointer font-semibold flex-shrink-0"
           >
             发送
           </button>
