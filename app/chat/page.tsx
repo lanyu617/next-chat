@@ -337,7 +337,13 @@ export default function ChatPage() {
               className={`mb-2 p-2 rounded shadow-sm ${msg.sender === 'user' ? 'bg-blue-100 self-end' : 'bg-white self-start'}`}
               style={{ maxWidth: '70%', marginLeft: msg.sender === 'user' ? 'auto' : 'unset' }}
             >
-              <ReactMarkdown className="[&>p]:mb-0">{msg.content}</ReactMarkdown>
+              <ReactMarkdown
+                components={{
+                  p: ({ node, ...props }) => <p className="mb-0" {...props} />,
+                }}
+              >
+                {msg.content}
+              </ReactMarkdown>
             </div>
           ))}
         </div>
