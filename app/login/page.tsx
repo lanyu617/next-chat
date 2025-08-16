@@ -1,9 +1,10 @@
 'use client';
-import { useState, useEffect } from 'react'; // Import useEffect
+import { useState, useEffect, Suspense } from 'react'; // Import Suspense
 import { useRouter, useSearchParams } from 'next/navigation'; // Import useSearchParams
 import { Button, Input, Form } from 'antd'; // Import Ant Design components
 
-export default function LoginPage() {
+// Move the core login logic into a separate component
+function LoginContent() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
@@ -109,5 +110,14 @@ export default function LoginPage() {
         Don&apos;t have an account? <a href="/register" className="text-blue-500 hover:underline">Register here</a>
       </p>
     </div>
+  );
+}
+
+// Export the main page component which wraps LoginContent in Suspense
+export default function LoginPageWrapper() {
+  return (
+    <Suspense fallback={<div>Loading login page...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }
