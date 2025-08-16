@@ -408,7 +408,7 @@ export default function ChatPage() {
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               style={{ marginRight: '16px' }}
             />
-            <h1 className="text-xl font-semibold">
+            <h1 className="text-xl font-semibold mb-0 mt-0"> {/* Add mb-0 and mt-0 to remove vertical margins */}
               {activeSession ? activeSession.title : 'Loading...'}
             </h1>
             {activeSession && (
