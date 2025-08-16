@@ -52,7 +52,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-100 to-teal-100 p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-200 to-indigo-200 p-4">
       <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
         <h1 className="text-4xl font-extrabold text-center mb-6 text-gray-800">加入 NextChat</h1>
         <p className="text-center text-gray-600 mb-8">创建你的新账户</p>
@@ -60,7 +60,7 @@ export default function RegisterPage() {
           <input
             type="text"
             placeholder="选择一个用户名"
-            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-400 focus:border-transparent transition duration-200 ease-in-out text-lg"
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out text-lg"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
@@ -68,7 +68,7 @@ export default function RegisterPage() {
           <input
             type="password"
             placeholder="设置你的密码"
-            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-400 focus:border-transparent transition duration-200 ease-in-out text-lg"
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out text-lg"
             value={password}
             onChange={(e) => {
               setPassword(e.target.value);
@@ -79,14 +79,14 @@ export default function RegisterPage() {
           {passwordError && <p className="text-red-500 text-sm mt-1">{passwordError}</p>} {/* Error message */}
           <button
             type="submit"
-            className="w-full p-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-md hover:from-green-600 hover:to-green-700 transition duration-300 ease-in-out shadow-lg text-lg"
+            className="w-full p-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-md hover:from-blue-600 hover:to-indigo-700 transition duration-300 ease-in-out shadow-lg text-lg"
           >
             注册
           </button>
         </form>
         {message && <p className="mt-6 text-center text-red-500 font-medium">{message}</p>}
         <p className="mt-6 text-center text-gray-700 text-base">
-          已经有账户？ <a href="/login" className="text-green-600 hover:underline font-semibold">立即登录</a>
+          已经有账户？ <a href="/login" className="text-blue-600 hover:underline font-semibold">立即登录</a>
         </p>
       </div>
     </div>
