@@ -303,31 +303,31 @@ export default function ChatPage() {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col bg-gray-50">
         {/* Header */}
-        <header className="bg-gradient-to-r from-blue-500 to-indigo-600 p-4 flex items-center justify-between shadow-md">
+        <header className="bg-white p-4 flex items-center justify-between">
           <div className="flex items-center">
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="mr-4 p-2 rounded bg-blue-700 text-white hover:bg-blue-800 transition duration-300 ease-in-out cursor-pointer"
+              className="mr-4 p-2 rounded bg-gray-300"
             >
-              {isSidebarOpen ? '☰' : '▶'} {/* Change icon based on state */}
+              {isSidebarOpen ? '☰' : '▶'}
             </button>
-            <h1 className="text-2xl font-semibold text-white">
-              {activeSession ? activeSession.title : '选择或创建会话...'}
+            <h1 className="text-xl font-semibold">
+              {activeSession ? activeSession.title : 'Loading...'}
             </h1>
           </div>
           {isLoggedIn ? (
             <button
               onClick={handleLogout}
-              className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300 ease-in-out cursor-pointer"
+              className="p-2 bg-red-300 text-white rounded"
             >
-              注销
+              Logout
             </button>
           ) : (
             <button
               onClick={() => router.push('/login')}
-              className="p-2 bg-blue-700 text-white rounded-md hover:bg-blue-800 transition duration-300 ease-in-out cursor-pointer"
+              className="p-2 bg-blue-500 text-white rounded"
             >
-              登录
+              Login
             </button>
           )}
         </header>
