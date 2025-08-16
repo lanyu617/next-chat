@@ -334,7 +334,7 @@ export default function ChatPage() {
 
         {/* Message Area */}
         <div className="flex-1 p-4 overflow-y-auto bg-gray-50 flex flex-col" ref={messagesEndRef}>
-          {activeSession?.messages.map((msg, index) => (
+          {activeSession?.messages && activeSession.messages.map((msg, index) => (
             <div
               key={index}
               className={`mb-2 p-2 rounded shadow-sm ${msg.sender === 'user' ? 'bg-blue-100 self-end' : 'bg-white self-start'}`}
