@@ -370,7 +370,7 @@ export default function ChatPage() {
             >
               <ReactMarkdown
                 components={{
-                  p: ({ node, ...props }) => <p style={{ margin: '0px' }} {...props} />,
+                  p: ({ ...props }) => <p style={{ margin: '0px' }} {...props} />,
                 }}
               >
                 {msg.content}

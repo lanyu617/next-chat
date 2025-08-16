@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react'; // Import useEffect
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation'; // Import useSearchParams
 import { Button, Input, Form } from 'antd'; // Import Ant Design components
 
 export default function LoginPage() {
@@ -9,14 +9,15 @@ export default function LoginPage() {
   const [message, setMessage] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const router = useRouter();
+  const searchParams = useSearchParams(); // Get search params
 
   // Check for messages in URL on component mount
   useEffect(() => {
-    const queryMessage = router.query?.message; // Access query parameters
+    const queryMessage = searchParams.get('message'); // Use searchParams.get
     if (queryMessage === 'expired') {
       setMessage('Your session has expired. Please log in again.');
     }
-  }, [router.query?.message]); // Depend on query.message
+  }, [searchParams]); // Depend on searchParams
 
   const validatePassword = (pwd: string) => {
     const passwordRegex = /^[a-zA-Z0-9_]{6,20}$/;
