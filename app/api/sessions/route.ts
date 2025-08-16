@@ -16,11 +16,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(sessionsResult.rows, { status: 200 });
   } catch (error: unknown) {
     console.error('Error fetching sessions:', error);
-    let errorMessage = 'Internal server error';
     if (error instanceof Error) {
-      errorMessage = error.message;
+      if (error.message === 'TokenExpiredError') {
+        return NextResponse.json({ message: 'Token expired' }, { status: 401 });
+      } else if (error.message === 'Invalid token' || error.message === 'No token provided.') {
+        return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
+      }
     }
-    return NextResponse.json({ message: errorMessage }, { status: 500 });
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -43,11 +46,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(newSessionResult.rows[0], { status: 201 });
   } catch (error: unknown) {
     console.error('Error creating session:', error);
-    let errorMessage = 'Internal server error';
     if (error instanceof Error) {
-      errorMessage = error.message;
+      if (error.message === 'TokenExpiredError') {
+        return NextResponse.json({ message: 'Token expired' }, { status: 401 });
+      } else if (error.message === 'Invalid token' || error.message === 'No token provided.') {
+        return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
+      }
     }
-    return NextResponse.json({ message: errorMessage }, { status: 500 });
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 }
 

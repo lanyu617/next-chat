@@ -40,11 +40,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(messagesResult.rows, { status: 200 });
   } catch (error: unknown) {
     console.error('Error fetching messages:', error);
-    let errorMessage = 'Internal server error';
     if (error instanceof Error) {
-      errorMessage = error.message;
+      if (error.message === 'TokenExpiredError') {
+        return NextResponse.json({ message: 'Token expired' }, { status: 401 });
+      } else if (error.message === 'Invalid token' || error.message === 'No token provided.') {
+        return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
+      }
     }
-    return NextResponse.json({ message: errorMessage }, { status: (error instanceof Error && errorMessage.includes('token')) ? 401 : 500 });
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -55,7 +58,7 @@ export async function POST(req: NextRequest) {
     const decodedToken = verifyToken(req);
     const userId = decodedToken.id;
 
-    const { message, sessionId } = await req.json(); // Get message and session ID from frontend
+    const { message, sessionId } = await req.json();
 
     if (!sessionId) {
       return NextResponse.json({ message: 'Session ID is required' }, { status: 400 });
@@ -80,7 +83,7 @@ export async function POST(req: NextRequest) {
     const encoder = new TextEncoder();
     const customReadable = new ReadableStream({
       async start(controller) {
-        let botAccumulatedResponse = ''; // To store the full bot response
+        let botAccumulatedResponse = '';
         try {
           const stream = await openai.chat.completions.create({
             messages: [{ role: "user", content: message }],
@@ -90,7 +93,7 @@ export async function POST(req: NextRequest) {
 
           for await (const chunk of stream) {
             const content = chunk.choices[0]?.delta?.content || "";
-            botAccumulatedResponse += content; // Accumulate bot response
+            botAccumulatedResponse += content;
             controller.enqueue(encoder.encode(content));
           }
           controller.close();
@@ -100,7 +103,6 @@ export async function POST(req: NextRequest) {
             'INSERT INTO messages (session_id, sender, content) VALUES ($1, $2, $3)',
             [sessionId, 'bot', botAccumulatedResponse]
           );
-
         } catch (error) {
           console.error('Error calling DeepSeek API:', error);
           controller.error(encoder.encode('Error from DeepSeek API.'));
@@ -119,10 +121,13 @@ export async function POST(req: NextRequest) {
   } catch (error: unknown) {
     // Handle token verification errors or other top-level errors
     console.error('Chat API error:', error);
-    let errorMessage = 'Internal server error';
     if (error instanceof Error) {
-      errorMessage = error.message;
+      if (error.message === 'TokenExpiredError') {
+        return NextResponse.json({ message: 'Token expired' }, { status: 401 });
+      } else if (error.message === 'Invalid token' || error.message === 'No token provided.') {
+        return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
+      }
     }
-    return NextResponse.json({ message: errorMessage }, { status: (error instanceof Error && errorMessage.includes('token')) ? 401 : 500 });
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 }

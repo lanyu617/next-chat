@@ -42,9 +42,16 @@ export default function ChatPage() {
         const data = await response.json();
         return data;
       } else if (response.status === 401) {
-        localStorage.removeItem('token');
-        setIsLoggedIn(false);
-        router.push('/login');
+        const errorData = await response.json();
+        if (errorData.message === 'Token expired') {
+          localStorage.removeItem('token');
+          setIsLoggedIn(false);
+          router.push('/login?message=expired'); // Redirect with expired message
+        } else {
+          localStorage.removeItem('token');
+          setIsLoggedIn(false);
+          router.push('/login');
+        }
         return [];
       } else {
         console.error(`Failed to fetch messages for session ${sessionId}`, response.statusText);
@@ -52,6 +59,10 @@ export default function ChatPage() {
       }
     } catch (error) {
       console.error(`Error fetching messages for session ${sessionId}:`, error);
+      // It's possible a network error or other client-side error happens before 401 response
+      localStorage.removeItem('token');
+      setIsLoggedIn(false);
+      router.push('/login');
       return [];
     }
   }, [router, setIsLoggedIn]); // Dependencies for useCallback
@@ -70,27 +81,37 @@ export default function ChatPage() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ title: `New Session ${sessions.length + 1}` }), // Provide a default title
+        body: JSON.stringify({ title: `New Session ${sessions.length + 1}` }),
       });
 
       if (response.ok) {
         const newSession = await response.json();
-        // After creating a new session, fetch its messages
         const fetchedMessages = await fetchMessagesForSession(newSession.id, token);
         const sessionWithMessages = { ...newSession, messages: fetchedMessages };
 
         setSessions((prevSessions) => [...prevSessions, sessionWithMessages]);
         setActiveSessionId(newSession.id);
-        return newSession; // Return the newly created session
+        return newSession;
       } else if (response.status === 401) {
-        localStorage.removeItem('token');
-        setIsLoggedIn(false);
-        router.push('/login');
+        const errorData = await response.json();
+        if (errorData.message === 'Token expired') {
+          localStorage.removeItem('token');
+          setIsLoggedIn(false);
+          router.push('/login?message=expired'); // Redirect with expired message
+        } else {
+          localStorage.removeItem('token');
+          setIsLoggedIn(false);
+          router.push('/login');
+        }
       } else {
         console.error('Failed to create new session', response.statusText);
       }
     } catch (error) {
       console.error('Error creating new session:', error);
+      // It's possible a network error or other client-side error happens before 401 response
+      localStorage.removeItem('token');
+      setIsLoggedIn(false);
+      router.push('/login');
     }
   }, [sessions.length, router, fetchMessagesForSession, setSessions, setActiveSessionId, setIsLoggedIn]); // Dependencies for useCallback
 
@@ -102,7 +123,6 @@ export default function ChatPage() {
 
     const newUserMessage: Message = { sender: 'user', content: userMessage };
 
-    // Optimistically update UI with user's message
     setSessions((prevSessions) =>
       prevSessions.map((s) =>
         s.id === activeSessionId
@@ -123,8 +143,22 @@ export default function ChatPage() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ message: userMessage, sessionId: activeSession.id }), // Send session ID
+        body: JSON.stringify({ message: userMessage, sessionId: activeSession.id }),
       });
+
+      if (response.status === 401) {
+        const errorData = await response.json();
+        if (errorData.message === 'Token expired') {
+          localStorage.removeItem('token');
+          setIsLoggedIn(false);
+          router.push('/login?message=expired'); // Redirect with expired message
+        } else {
+          localStorage.removeItem('token');
+          setIsLoggedIn(false);
+          router.push('/login');
+        }
+        return;
+      }
 
       if (!response.body) {
         throw new Error('Response body is empty.');
@@ -134,7 +168,6 @@ export default function ChatPage() {
       const decoder = new TextDecoder();
       let accumulatedResponse = '';
 
-      // Add a placeholder for the bot's response
       setSessions((prevSessions) =>
         prevSessions.map((s) =>
           s.id === activeSessionId
@@ -150,7 +183,6 @@ export default function ChatPage() {
         }
         accumulatedResponse += decoder.decode(value, { stream: true });
 
-        // Update the last message (which is the bot's response) for the active session
         setSessions((prevSessions) =>
           prevSessions.map((s) =>
             s.id === activeSessionId
@@ -168,20 +200,10 @@ export default function ChatPage() {
       }
     } catch (error) {
       console.error('Error fetching streamed data:', error);
-      setSessions((prevSessions) =>
-        prevSessions.map((s) =>
-          s.id === activeSessionId
-            ? {
-                ...s,
-                messages: s.messages.map((msg, index) =>
-                  index === s.messages.length - 1
-                    ? { ...msg, content: `Error: ${error instanceof Error ? error.message : 'Could not get response.'}` }
-                    : msg
-                ),
-              }
-            : s
-        )
-      );
+      // Handle network errors or other client-side error happens before 401 response
+      localStorage.removeItem('token');
+      setIsLoggedIn(false);
+      router.push('/login');
     }
   };
 
@@ -212,23 +234,32 @@ export default function ChatPage() {
 
         if (response.ok) {
           const data = await response.json();
-          setSessions(data); // Set fetched sessions
+          setSessions(data);
           if (data.length > 0) {
-            setActiveSessionId(data[0].id); // Set the first session as active
+            setActiveSessionId(data[0].id);
           } else {
-            // If no sessions exist, create a new one
             await createNewSessionBackend();
           }
         } else if (response.status === 401) {
-          localStorage.removeItem('token');
-          setIsLoggedIn(false);
-          router.push('/login');
+          const errorData = await response.json();
+          if (errorData.message === 'Token expired') {
+            localStorage.removeItem('token');
+            setIsLoggedIn(false);
+            router.push('/login?message=expired'); // Redirect with expired message
+          } else {
+            localStorage.removeItem('token');
+            setIsLoggedIn(false);
+            router.push('/login');
+          }
         } else {
           console.error('Failed to fetch sessions', response.statusText);
         }
       } catch (error) {
         console.error('Error fetching sessions:', error);
-        // Handle network errors or other issues
+        // It's possible a network error or other client-side error happens before 401 response
+        localStorage.removeItem('token');
+        setIsLoggedIn(false);
+        router.push('/login');
       }
     };
 
