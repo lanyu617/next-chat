@@ -294,51 +294,56 @@ export default function ChatPage() {
               }
             }
           }}
-          className="mt-4 p-2 bg-green-500 text-white rounded w-full hover:bg-green-600"
+          className="mt-4 p-3 bg-green-600 text-white rounded-md w-full hover:bg-green-700 transition duration-300 ease-in-out shadow-md cursor-pointer"
         >
-          + New Session
+          + 新会话
         </button>
       </aside>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col bg-gray-50">
         {/* Header */}
-        <header className="bg-gray-200 p-4 flex items-center justify-between">
+        <header className="bg-gradient-to-r from-blue-500 to-indigo-600 p-4 flex items-center justify-between shadow-md">
           <div className="flex items-center">
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="mr-4 p-2 rounded bg-gray-300"
+              className="mr-4 p-2 rounded bg-blue-700 text-white hover:bg-blue-800 transition duration-300 ease-in-out cursor-pointer"
             >
               {isSidebarOpen ? '☰' : '▶'} {/* Change icon based on state */}
             </button>
-            <h1 className="text-xl font-semibold">
-              {activeSession ? activeSession.title : 'Loading...'}
+            <h1 className="text-2xl font-semibold text-white">
+              {activeSession ? activeSession.title : '选择或创建会话...'}
             </h1>
           </div>
           {isLoggedIn ? (
             <button
               onClick={handleLogout}
-              className="p-2 bg-red-500 text-white rounded"
+              className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300 ease-in-out cursor-pointer"
             >
-              Logout
+              注销
             </button>
           ) : (
             <button
               onClick={() => router.push('/login')}
-              className="p-2 bg-blue-500 text-white rounded"
+              className="p-2 bg-blue-700 text-white rounded-md hover:bg-blue-800 transition duration-300 ease-in-out cursor-pointer"
             >
-              Login
+              登录
             </button>
           )}
         </header>
 
         {/* Message Area */}
-        <div className="flex-1 p-4 overflow-y-auto bg-gray-50 flex flex-col" ref={messagesEndRef}>
-          {activeSession?.messages && activeSession.messages.map((msg, index) => (
+        <div className="flex-1 p-6 overflow-y-auto flex flex-col space-y-4" ref={messagesEndRef}>
+          {!activeSessionId && (
+            <div className="flex-1 flex items-center justify-center text-gray-500 text-lg">
+              <p>请选择一个会话或创建新会话开始对话。</p>
+            </div>
+          )}
+          {activeSessionId && activeSession?.messages && activeSession.messages.map((msg, index) => (
             <div
               key={index}
-              className={`mb-2 p-2 rounded shadow-sm ${msg.sender === 'user' ? 'bg-blue-100 self-end' : 'bg-white self-start'}`}
-              style={{ maxWidth: '70%', marginLeft: msg.sender === 'user' ? 'auto' : 'unset' }}
+              className={`p-4 rounded-xl shadow-md ${msg.sender === 'user' ? 'bg-blue-500 text-white self-end rounded-br-none' : 'bg-gray-200 text-gray-800 self-start rounded-bl-none'}`}
+              style={{ maxWidth: '80%' }}
             >
               <ReactMarkdown>{msg.content}</ReactMarkdown>
             </div>
@@ -346,11 +351,11 @@ export default function ChatPage() {
         </div>
 
         {/* Input Box */}
-        <div className="p-4 bg-gray-200 flex">
+        <div className="p-4 bg-gray-200 flex items-center shadow-inner">
           <input
             type="text"
-            placeholder="Type your message..."
-            className="flex-1 p-2 border border-gray-300 rounded-l focus:outline-none"
+            placeholder="输入你的消息..."
+            className="flex-1 p-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200 ease-in-out text-lg"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => {
@@ -361,9 +366,9 @@ export default function ChatPage() {
           />
           <button
             onClick={handleSendMessage}
-            className="p-2 bg-blue-500 text-white rounded-r hover:bg-blue-600"
+            className="p-3 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600 transition duration-300 ease-in-out cursor-pointer font-semibold"
           >
-            Send
+            发送
           </button>
         </div>
       </div>

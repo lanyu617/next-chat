@@ -53,40 +53,43 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-24">
-      <h1>Login to NextChat</h1>
-      <form onSubmit={handleLogin} className="flex flex-col gap-4 mt-8">
-        <input
-          type="text"
-          placeholder="Username"
-          className="p-2 border border-gray-300 rounded"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="p-2 border border-gray-300 rounded"
-          value={password}
-          onChange={(e) => {
-            setPassword(e.target.value);
-            validatePassword(e.target.value); // Real-time validation
-          }}
-          required
-        />
-        {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>} {/* Error message */}
-        <button
-          type="submit"
-          className="p-2 bg-blue-500 text-white rounded"
-        >
-          Login
-        </button>
-      </form>
-      {message && <p className="mt-4 text-center text-red-500">{message}</p>}
-      <p className="mt-4">
-        Don&apos;t have an account? <a href="/register" className="text-blue-500 hover:underline">Register here</a>
-      </p>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100 p-4">
+      <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
+        <h1 className="text-4xl font-extrabold text-center mb-6 text-gray-800">欢迎回来！</h1>
+        <p className="text-center text-gray-600 mb-8">登录 NextChat 继续对话</p>
+        <form onSubmit={handleLogin} className="flex flex-col gap-5">
+          <input
+            type="text"
+            placeholder="用户名"
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200 ease-in-out text-lg"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="密码"
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200 ease-in-out text-lg"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              validatePassword(e.target.value); // Real-time validation
+            }}
+            required
+          />
+          {passwordError && <p className="text-red-500 text-sm mt-1">{passwordError}</p>} {/* Error message */}
+          <button
+            type="submit"
+            className="w-full p-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold rounded-md hover:from-blue-600 hover:to-blue-700 transition duration-300 ease-in-out shadow-lg text-lg"
+          >
+            登录
+          </button>
+        </form>
+        {message && <p className="mt-6 text-center text-red-500 font-medium">{message}</p>}
+        <p className="mt-6 text-center text-gray-700 text-base">
+          还没有账户？ <a href="/register" className="text-blue-600 hover:underline font-semibold">立即注册</a>
+        </p>
+      </div>
     </div>
   );
 }
