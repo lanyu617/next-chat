@@ -27,24 +27,24 @@ export default function HeaderBar({
   onShowMobileSessionList,
 }: HeaderBarProps) {
   return (
-    <header className="bg-white p-4 sm:p-2 flex items-center justify-between shadow-md">
-      <div className="flex items-center flex-shrink-0">
+    <header className="bg-white p-4 flex items-center justify-between shadow-md min-w-0 overflow-x-hidden">
+      <div className="flex items-center flex-grow overflow-hidden gap-x-2">
         {isMobile ? (
           <Button
             type="text"
             icon={<MessageOutlined />} // Icon for showing sessions on mobile
             onClick={onShowMobileSessionList}
-            className="mr-4" // Replaced inline style
+            className="mr-2 flex-shrink-0" // Replaced inline style and added flex-shrink-0
           />
         ) : (
           <Button
             type="text"
             icon={isSidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="mr-4" // Replaced inline style
+            className="mr-2 flex-shrink-0" // Replaced inline style and added flex-shrink-0
           />
         )}
-        <h1 className="text-xl font-semibold mb-0 mt-0 flex-1 min-w-0 truncate"> {/* Add flex-1, min-w-0, truncate */}
+        <h1 className="text-lg sm:text-xl font-semibold mb-0 mt-0 overflow-hidden text-ellipsis"> {/* Changed text-xl to responsive text-lg sm:text-xl */}
           {activeSession ? activeSession.title : 'Loading...'}
         </h1>
         {activeSession && (
@@ -52,7 +52,7 @@ export default function HeaderBar({
             type="text"
             icon={<EditOutlined />}
             onClick={showEditModal}
-            className="ml-2" // Replaced inline style
+            className="ml-2 flex-shrink-0" // Added flex-shrink-0
           />
         )}
       </div>

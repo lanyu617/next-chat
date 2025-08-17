@@ -12,7 +12,7 @@ export default function InputBox({
   handleSendMessage,
 }: InputBoxProps) {
   return (
-    <div className="px-2 py-4 sm:px-4 bg-gray-200 flex w-full">
+    <div className="px-2 py-4 md:px-4 bg-gray-200 flex flex-col md:flex-row w-full">
       <Input.TextArea
         placeholder="Type your message..."
         value={input}
@@ -23,9 +23,9 @@ export default function InputBox({
           handleSendMessage();
         }}
         autoSize={{ minRows: 1, maxRows: 5 }}
-        className="flex-1 mr-2 min-w-0"
+        className="flex-1 mr-2 min-w-0 w-full mb-2 md:mb-0"
       />
-      <Button type="primary" onClick={handleSendMessage} className="flex-shrink-0">
+      <Button type="primary" onClick={handleSendMessage} className="flex-shrink-0 w-full md:w-auto self-end md:self-auto">
         Send
       </Button>
     </div>
