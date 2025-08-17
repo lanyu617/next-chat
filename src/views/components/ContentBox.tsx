@@ -20,7 +20,7 @@ export default function ContentBox({
       {(activeSessionMessages || []).map((msg, index) => (
         <div
           key={index}
-          className={`mb-2 p-2 rounded shadow-sm ${msg.sender === 'user' ? 'bg-blue-100 self-end' : 'bg-white self-start'} max-w-[calc(100%-20px)] break-words`}
+          className={`mb-2 p-2 rounded shadow-sm ${msg.sender === 'user' ? 'bg-blue-100 self-end' : 'bg-white self-start'} max-w-full break-words mx-0 sm:mx-2`}
           style={{ marginLeft: msg.sender === 'user' ? 'auto' : 'unset' }} // Removed redundant width/maxWidth
         >
           <ReactMarkdown

@@ -23,9 +23,9 @@ export default function InputBox({
           handleSendMessage();
         }}
         autoSize={{ minRows: 1, maxRows: 5 }}
-        className="flex-1 mr-2 min-w-0 w-full mb-2 md:mb-0"
+        className="flex-1 mr-2 min-w-0 mb-2 md:mb-0"
       />
-      <Button type="primary" onClick={handleSendMessage} className="flex-shrink-0 w-full md:w-auto self-end md:self-auto">
+      <Button type="primary" onClick={handleSendMessage} className="flex-shrink-0 w-auto self-end md:self-auto">
         Send
       </Button>
     </div>

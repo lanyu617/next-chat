@@ -27,21 +27,21 @@ export default function HeaderBar({
   onShowMobileSessionList,
 }: HeaderBarProps) {
   return (
-    <header className="bg-white p-4 flex items-center justify-between shadow-md min-w-0 overflow-x-hidden">
+    <header className="bg-white p-2 sm:p-4 flex items-center justify-between shadow-md min-w-0 overflow-x-hidden">
       <div className="flex items-center flex-grow overflow-hidden gap-x-2">
         {isMobile ? (
           <Button
             type="text"
             icon={<MessageOutlined />} // Icon for showing sessions on mobile
             onClick={onShowMobileSessionList}
-            className="mr-2 flex-shrink-0" // Replaced inline style and added flex-shrink-0
+            className="mr-2 flex-shrink-0" // Ensure flex-shrink-0 is present
           />
         ) : (
           <Button
             type="text"
             icon={isSidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="mr-2 flex-shrink-0" // Replaced inline style and added flex-shrink-0
+            className="mr-2 flex-shrink-0" // Ensure flex-shrink-0 is present
           />
         )}
         <h1 className="text-lg sm:text-xl font-semibold mb-0 mt-0 overflow-hidden text-ellipsis"> {/* Changed text-xl to responsive text-lg sm:text-xl */}
