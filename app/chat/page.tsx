@@ -329,7 +329,7 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden w-full max-w-full">
       {!isMobile && (
         <SessionList
           sessions={sessions}
@@ -345,7 +345,8 @@ export default function ChatPage() {
         />
       )}
 
-      <div className="flex-1 flex flex-col px-4 sm:px-6 md:px-8 gap-y-4">
+      <div className="flex-1 flex flex-col w-full min-w-0 max-w-full overflow-hidden"
+           style={{ maxWidth: '100%' }}>
         <HeaderBar
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}

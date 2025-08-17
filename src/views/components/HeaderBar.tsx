@@ -27,24 +27,26 @@ export default function HeaderBar({
   onShowMobileSessionList,
 }: HeaderBarProps) {
   return (
-    <header className="bg-white p-2 sm:p-4 flex items-center justify-between shadow-md min-w-0 overflow-x-hidden">
-      <div className="flex items-center flex-grow overflow-hidden gap-x-2">
+    <header className="bg-white p-2 sm:p-4 flex items-center justify-between shadow-md w-full max-w-full overflow-hidden">
+      <div className="flex items-center min-w-0 flex-1 mr-2">
         {isMobile ? (
           <Button
             type="text"
-            icon={<MessageOutlined />} // Icon for showing sessions on mobile
+            icon={<MessageOutlined />}
             onClick={onShowMobileSessionList}
-            className="mr-2 flex-shrink-0" // Ensure flex-shrink-0 is present
+            className="flex-shrink-0 mr-1 sm:mr-2"
+            size="small"
           />
         ) : (
           <Button
             type="text"
             icon={isSidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="mr-2 flex-shrink-0" // Ensure flex-shrink-0 is present
+            className="flex-shrink-0 mr-1 sm:mr-2"
+            size="small"
           />
         )}
-        <h1 className="text-lg sm:text-xl font-semibold mb-0 mt-0 overflow-hidden text-ellipsis"> {/* Changed text-xl to responsive text-lg sm:text-xl */}
+        <h1 className="text-sm sm:text-lg font-semibold mb-0 mt-0 truncate flex-1 min-w-0">
           {activeSession ? activeSession.title : 'Loading...'}
         </h1>
         {activeSession && (
@@ -52,19 +54,33 @@ export default function HeaderBar({
             type="text"
             icon={<EditOutlined />}
             onClick={showEditModal}
-            className="ml-2 flex-shrink-0" // Added flex-shrink-0
+            className="flex-shrink-0 ml-1 sm:ml-2"
+            size="small"
           />
         )}
       </div>
-      {isLoggedIn ? (
-        <Button type="primary" danger onClick={handleLogout} className="text-sm px-2 py-1 flex-shrink-0"> {/* Added compact styles and flex-shrink-0 */}
-          Logout
-        </Button>
-      ) : (
-        <Button type="primary" onClick={() => router.push('/login')} className="text-sm px-2 py-1 flex-shrink-0"> {/* Added compact styles and flex-shrink-0 */}
-          Login
-        </Button>
-      )}
+      <div className="flex-shrink-0">
+        {isLoggedIn ? (
+          <Button 
+            type="primary" 
+            danger 
+            onClick={handleLogout} 
+            className="text-xs sm:text-sm px-1 sm:px-2 py-1"
+            size="small"
+          >
+            Logout
+          </Button>
+        ) : (
+          <Button 
+            type="primary" 
+            onClick={() => router.push('/login')} 
+            className="text-xs sm:text-sm px-1 sm:px-2 py-1"
+            size="small"
+          >
+            Login
+          </Button>
+        )}
+      </div>
     </header>
   );
 }

@@ -13,25 +13,35 @@ export default function ContentBox({
 }: ContentBoxProps) {
   return (
     <div
-      className="flex-1 py-4 overflow-y-auto bg-gray-50 flex flex-col" // Removed px-2 sm:px-4
+      className="flex-1 py-4 overflow-y-auto bg-gray-50 flex flex-col w-full"
       ref={messagesEndRef}
-      style={{ maxWidth: '100%', margin: '0 auto', overflowX: 'hidden' }}
+      style={{ maxWidth: '100%', overflowX: 'hidden' }}
     >
-      {(activeSessionMessages || []).map((msg, index) => (
-        <div
-          key={index}
-          className={`mb-2 p-2 rounded shadow-sm ${msg.sender === 'user' ? 'bg-blue-100 self-end' : 'bg-white self-start'} max-w-full break-words mx-0 sm:mx-2`}
-          style={{ marginLeft: msg.sender === 'user' ? 'auto' : 'unset' }} // Removed redundant width/maxWidth
-        >
-          <ReactMarkdown
-            components={{
-              p: ({ ...props }) => <p style={{ margin: '0px' }} {...props} />,
+      <div className="px-2 sm:px-4 w-full max-w-full">
+        {(activeSessionMessages || []).map((msg, index) => (
+          <div
+            key={index}
+            className={`mb-3 p-3 rounded-lg shadow-sm w-fit max-w-[85%] sm:max-w-[75%] md:max-w-[70%] ${
+              msg.sender === 'user' 
+                ? 'bg-blue-100 ml-auto text-right' 
+                : 'bg-white mr-auto text-left'
+            }`}
+            style={{ 
+              wordBreak: 'break-word',
+              overflowWrap: 'break-word',
+              hyphens: 'auto'
             }}
           >
-            {msg.content}
-          </ReactMarkdown>
-        </div>
-      ))}
+            <ReactMarkdown
+              components={{
+                p: ({ ...props }) => <p style={{ margin: '0px' }} {...props} />,
+              }}
+            >
+              {msg.content}
+            </ReactMarkdown>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
