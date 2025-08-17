@@ -34,14 +34,14 @@ export default function HeaderBar({
             type="text"
             icon={<MessageOutlined />} // Icon for showing sessions on mobile
             onClick={onShowMobileSessionList}
-            style={{ marginRight: '16px' }}
+            className="mr-4" // Replaced inline style
           />
         ) : (
           <Button
             type="text"
             icon={isSidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            style={{ marginRight: '16px' }}
+            className="mr-4" // Replaced inline style
           />
         )}
         <h1 className="text-xl font-semibold mb-0 mt-0 flex-1 min-w-0 truncate"> {/* Add flex-1, min-w-0, truncate */}

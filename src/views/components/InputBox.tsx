@@ -12,7 +12,7 @@ export default function InputBox({
   handleSendMessage,
 }: InputBoxProps) {
   return (
-    <div className="p-4 bg-gray-200 flex w-full">
+    <div className="px-2 py-4 sm:px-4 bg-gray-200 flex w-full">
       <Input.TextArea
         placeholder="Type your message..."
         value={input}

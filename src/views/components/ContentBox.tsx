@@ -13,7 +13,7 @@ export default function ContentBox({
 }: ContentBoxProps) {
   return (
     <div
-      className="flex-1 p-4 overflow-y-auto bg-gray-50 flex flex-col"
+      className="flex-1 px-2 py-4 sm:px-4 overflow-y-auto bg-gray-50 flex flex-col" // Changed p-4 to responsive px and py
       ref={messagesEndRef}
       style={{ maxWidth: '100%', margin: '0 auto', overflowX: 'hidden' }} // Added overflowX: 'hidden'
     >

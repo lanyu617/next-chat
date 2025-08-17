@@ -345,7 +345,7 @@ export default function ChatPage() {
         />
       )}
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col px-4 sm:px-6 md:px-8">
         <HeaderBar
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
