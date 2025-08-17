@@ -8,7 +8,7 @@ import ContentBox from '@/src/views/components/ContentBox';
 import InputBox from '@/src/views/components/InputBox';
 import { Message, Session } from '@/src/types/chat';
 import { Modal, Button, Input } from 'antd';
-import { EditOutlined } from '@ant-design/icons';
+// import { EditOutlined } from '@ant-design/icons'; // Removed unused import
 
 export default function ChatPage() {
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -341,6 +341,8 @@ export default function ChatPage() {
           isMobile={isMobile}
           isModalVisible={isModalVisible}
           setIsModalVisible={setIsModalVisible}
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
         />
       )}
 
@@ -401,6 +403,8 @@ export default function ChatPage() {
           isMobile={isMobile}
           isModalVisible={isModalVisible}
           setIsModalVisible={setIsModalVisible}
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
         />
       )}
     </div>

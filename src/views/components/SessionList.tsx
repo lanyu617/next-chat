@@ -11,6 +11,8 @@ interface SessionListProps {
   isMobile: boolean;
   isModalVisible: boolean;
   setIsModalVisible: (visible: boolean) => void;
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: (isOpen: boolean) => void; // Add this prop
 }
 
 export default function SessionList({
@@ -23,6 +25,8 @@ export default function SessionList({
   isMobile,
   isModalVisible,
   setIsModalVisible,
+  isSidebarOpen,
+  setIsSidebarOpen,
 }: SessionListProps) {
 
   const handleSessionClick = async (session: Session) => {
