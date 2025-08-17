@@ -113,6 +113,47 @@ export default function ChatPage() {
     }
   }, [sessions.length, router, fetchMessagesForSession, setSessions, setActiveSessionId, setIsLoggedIn]);
 
+  const deleteSessionBackend = useCallback(async (sessionId: string) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+      return false;
+    }
+
+    try {
+      const response = await fetch('/api/sessions', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ id: sessionId }),
+      });
+
+      if (response.ok) {
+        return true;
+      } else if (response.status === 401) {
+        const errorData = await response.json();
+        if (errorData.message === 'Token expired') {
+          localStorage.removeItem('token');
+          setIsLoggedIn(false);
+          router.push('/login?message=expired');
+        } else {
+          localStorage.removeItem('token');
+          setIsLoggedIn(false);
+          router.push('/login');
+        }
+        return false;
+      } else {
+        console.error('Failed to delete session');
+        return false;
+      }
+    } catch (error) {
+      console.error('Error deleting session:', error);
+      return false;
+    }
+  }, [router, setIsLoggedIn]);
+
   const fetchStreamedData = async (userMessage: string) => {
     if (!activeSession) {
       console.error('No active session found.');
@@ -338,6 +379,7 @@ export default function ChatPage() {
           fetchMessagesForSession={fetchMessagesForSession}
           setSessions={setSessions}
           createNewSessionBackend={createNewSessionBackend}
+          deleteSessionBackend={deleteSessionBackend}
           isMobile={isMobile}
           isModalVisible={isModalVisible}
           setIsModalVisible={setIsModalVisible}
@@ -400,6 +442,7 @@ export default function ChatPage() {
           fetchMessagesForSession={fetchMessagesForSession}
           setSessions={setSessions}
           createNewSessionBackend={createNewSessionBackend}
+          deleteSessionBackend={deleteSessionBackend}
           isMobile={isMobile}
           isModalVisible={isModalVisible}
           setIsModalVisible={setIsModalVisible}

@@ -98,3 +98,44 @@ export async function PATCH(req: NextRequest) {
   }
 }
 
+// Delete a session
+export async function DELETE(req: NextRequest) {
+  try {
+    const decodedToken = verifyToken(req);
+    const userId = decodedToken.id;
+
+    const { id } = await req.json();
+
+    if (!id) {
+      return NextResponse.json({ message: 'Session ID is required' }, { status: 400 });
+    }
+
+    // Verify that the session belongs to the authenticated user
+    const sessionCheck = await pool.query(
+      'SELECT id FROM sessions WHERE id = $1 AND user_id = $2',
+      [id, userId]
+    );
+
+    if (sessionCheck.rows.length === 0) {
+      return NextResponse.json({ message: 'Session not found or unauthorized' }, { status: 404 });
+    }
+
+    // Delete associated messages first (due to foreign key constraint)
+    await pool.query('DELETE FROM messages WHERE session_id = $1', [id]);
+    
+    // Then delete the session
+    await pool.query('DELETE FROM sessions WHERE id = $1', [id]);
+
+    return NextResponse.json({ message: 'Session deleted successfully' }, { status: 200 });
+  } catch (error: unknown) {
+    console.error('Error deleting session:', error);
+    if (error instanceof Error) {
+      if (error.message === 'TokenExpiredError') {
+        return NextResponse.json({ message: 'Token expired' }, { status: 401 });
+      } else if (error.message === 'Invalid token' || error.message === 'No token provided.') {
+        return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
+      }
+    }
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+  }
+}

@@ -1,4 +1,5 @@
-import { Button, List, Modal } from 'antd';
+import { Button, List, Modal, Popconfirm } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
 import { Session, Message } from '@/src/types/chat';
 
 interface SessionListProps {
@@ -8,6 +9,7 @@ interface SessionListProps {
   fetchMessagesForSession: (sessionId: string, token: string) => Promise<Message[]>;
   setSessions: React.Dispatch<React.SetStateAction<Session[]>>;
   createNewSessionBackend: () => Promise<Session | undefined>;
+  deleteSessionBackend: (sessionId: string) => Promise<boolean>;
   isMobile: boolean;
   isModalVisible: boolean;
   setIsModalVisible: (visible: boolean) => void;
@@ -21,6 +23,7 @@ export default function SessionList({
   fetchMessagesForSession,
   setSessions,
   createNewSessionBackend,
+  deleteSessionBackend,
   isMobile,
   isModalVisible,
   setIsModalVisible,
@@ -61,6 +64,27 @@ export default function SessionList({
     }
   };
 
+  const handleDeleteSession = async (sessionId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // 防止触发会话选择事件
+    
+    const success = await deleteSessionBackend(sessionId);
+    if (success) {
+      // 从会话列表中移除被删除的会话
+      setSessions((prevSessions) => prevSessions.filter(s => s.id !== sessionId));
+      
+      // 如果删除的是当前活动会话，切换到第一个可用会话
+      if (activeSessionId === sessionId) {
+        const remainingSessions = sessions.filter(s => s.id !== sessionId);
+        if (remainingSessions.length > 0) {
+          setActiveSessionId(remainingSessions[0].id);
+        } else {
+          // 如果没有剩余会话，创建新会话
+          await handleNewSession();
+        }
+      }
+    }
+  };
+
   const content = (
     <>
       <h2 className="text-xl font-semibold mb-4">Sessions</h2>
@@ -70,11 +94,32 @@ export default function SessionList({
           renderItem={(session) => (
             <List.Item
               key={session.id}
-              className={`${activeSessionId === session.id ? 'bg-blue-300 text-white' : 'hover:bg-gray-200'}`}
-              style={{ cursor: 'pointer', padding: '8px 12px', borderRadius: '4px' }}
+              className={`group relative ${activeSessionId === session.id ? 'bg-blue-300 text-white' : 'hover:bg-gray-200'}`}
+              style={{ cursor: 'pointer', padding: '8px 12px', borderRadius: '4px', border: 'none' }}
               onClick={() => handleSessionClick(session)}
             >
-              {session.title}
+              <div className="flex items-center justify-between w-full">
+                <span className="flex-1 truncate pr-2">
+                  {session.title}
+                </span>
+                <Popconfirm
+                  title="确认删除"
+                  description="你确定要删除这个会话吗？"
+                  onConfirm={(e) => handleDeleteSession(session.id, e!)}
+                  okText="确定"
+                  cancelText="取消"
+                  placement="topRight"
+                >
+                  <Button
+                    type="text"
+                    icon={<DeleteOutlined />}
+                    size="small"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                    onClick={(e) => e.stopPropagation()}
+                    title="删除会话"
+                  />
+                </Popconfirm>
+              </div>
             </List.Item>
           )}
         />
