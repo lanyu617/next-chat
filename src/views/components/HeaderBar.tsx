@@ -28,13 +28,14 @@ export default function HeaderBar({
 }: HeaderBarProps) {
   return (
     <header className="bg-white p-2 sm:p-4 flex items-center justify-between shadow-md w-full max-w-full overflow-hidden">
-      <div className="flex items-center min-w-0 flex-1 mr-2">
+      <div className="flex items-center min-w-0 flex-1">
+        {/* 菜单按钮 */}
         {isMobile ? (
           <Button
             type="text"
             icon={<MessageOutlined />}
             onClick={onShowMobileSessionList}
-            className="flex-shrink-0 mr-1 sm:mr-2"
+            className="flex-shrink-0 mr-2"
             size="small"
           />
         ) : (
@@ -42,30 +43,37 @@ export default function HeaderBar({
             type="text"
             icon={isSidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="flex-shrink-0 mr-1 sm:mr-2"
+            className="flex-shrink-0 mr-2"
             size="small"
           />
         )}
-        <h1 className="text-sm sm:text-lg font-semibold mb-0 mt-0 truncate flex-1 min-w-0">
-          {activeSession ? activeSession.title : 'Loading...'}
-        </h1>
-        {activeSession && (
-          <Button
-            type="text"
-            icon={<EditOutlined />}
-            onClick={showEditModal}
-            className="flex-shrink-0 ml-1 sm:ml-2"
-            size="small"
-          />
-        )}
+        
+        {/* 标题和编辑按钮的容器 */}
+        <div className="flex items-center min-w-0 flex-1 mr-4">
+          <h1 className="text-sm sm:text-lg font-semibold my-0 truncate min-w-0 flex-shrink mr-2">
+            {activeSession ? activeSession.title : 'Loading...'}
+          </h1>
+          {activeSession && (
+            <Button
+              type="text"
+              icon={<EditOutlined />}
+              onClick={showEditModal}
+              className="flex-shrink-0"
+              size="small"
+              title="编辑会话标题"
+            />
+          )}
+        </div>
       </div>
+      
+      {/* 右侧登录/退出按钮 */}
       <div className="flex-shrink-0">
         {isLoggedIn ? (
           <Button 
             type="primary" 
             danger 
             onClick={handleLogout} 
-            className="text-xs sm:text-sm px-1 sm:px-2 py-1"
+            className="text-xs sm:text-sm px-2 py-1"
             size="small"
           >
             Logout
@@ -74,7 +82,7 @@ export default function HeaderBar({
           <Button 
             type="primary" 
             onClick={() => router.push('/login')} 
-            className="text-xs sm:text-sm px-1 sm:px-2 py-1"
+            className="text-xs sm:text-sm px-2 py-1"
             size="small"
           >
             Login
