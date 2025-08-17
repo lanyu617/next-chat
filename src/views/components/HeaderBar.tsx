@@ -1,4 +1,5 @@
-import { Button, MenuFoldOutlined, MenuUnfoldOutlined, EditOutlined, MessageOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
+import { MenuFoldOutlined, MenuUnfoldOutlined, EditOutlined, MessageOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import { Session } from '@/src/types/chat';
 
