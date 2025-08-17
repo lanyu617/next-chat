@@ -1,21 +1,14 @@
 'use client';
 
-import { Button, Input, List, Modal } from 'antd'; // Import Modal
-import { MenuFoldOutlined, MenuUnfoldOutlined, EditOutlined } from '@ant-design/icons'; // Import EditOutlined
-import { useState, useEffect, useRef, useCallback } from 'react'; // Add useCallback
-import ReactMarkdown from 'react-markdown';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-
-interface Message {
-  sender: 'user' | 'bot';
-  content: string;
-}
-
-interface Session {
-  id: string;
-  title: string;
-  messages: Message[]; // Messages are fetched with session, but updated dynamically
-}
+import HeaderBar from '@/src/views/components/HeaderBar';
+import SessionList from '@/src/views/components/SessionList';
+import ContentBox from '@/src/views/components/ContentBox';
+import InputBox from '@/src/views/components/InputBox';
+import { Message, Session } from '@/src/types/chat';
+import { Modal, Button, Input } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
 
 export default function ChatPage() {
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -24,15 +17,25 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false); // State for modal visibility
-  const [editingTitle, setEditingTitle] = useState(''); // State for editing title
+  const [isModalVisible, setIsModalVisible] = useState(false); // State for session list modal visibility on mobile
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false); // State for editing title modal
+  const [editingTitle, setEditingTitle] = useState('');
+  const [isMobile, setIsMobile] = useState(false); // State for mobile detection
   const router = useRouter();
 
   const activeSession = activeSessionId
-    ? sessions.find((s) => s.id === activeSessionId)
+    ? sessions.find((s) => s.id === activeSessionId) || null
     : null;
 
-  // Helper to fetch messages for a given session
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768); // Example breakpoint for mobile
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Set initial state
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const fetchMessagesForSession = useCallback(async (sessionId: string, token: string) => {
     try {
       const response = await fetch(`/api/chat?sessionId=${sessionId}`, {
@@ -48,26 +51,22 @@ export default function ChatPage() {
         if (errorData.message === 'Token expired') {
           localStorage.removeItem('token');
           setIsLoggedIn(false);
-          router.push('/login?message=expired'); // Redirect with expired message
+          router.push('/login?message=expired');
         } else {
           localStorage.removeItem('token');
           setIsLoggedIn(false);
           router.push('/login');
         }
         return [];
-      } else {
-        console.error(`Failed to fetch messages for session ${sessionId}`, response.statusText);
-        return [];
       }
     } catch (error) {
       console.error(`Error fetching messages for session ${sessionId}:`, error);
-      // It's possible a network error or other client-side error happens before 401 response
       localStorage.removeItem('token');
       setIsLoggedIn(false);
       router.push('/login');
       return [];
     }
-  }, [router, setIsLoggedIn]); // Dependencies for useCallback
+  }, [router, setIsLoggedIn]);
 
   const createNewSessionBackend = useCallback(async () => {
     const token = localStorage.getItem('token');
@@ -99,23 +98,20 @@ export default function ChatPage() {
         if (errorData.message === 'Token expired') {
           localStorage.removeItem('token');
           setIsLoggedIn(false);
-          router.push('/login?message=expired'); // Redirect with expired message
+          router.push('/login?message=expired');
         } else {
           localStorage.removeItem('token');
           setIsLoggedIn(false);
           router.push('/login');
         }
-      } else {
-        console.error('Failed to create new session', response.statusText);
       }
     } catch (error) {
       console.error('Error creating new session:', error);
-      // It's possible a network error or other client-side error happens before 401 response
       localStorage.removeItem('token');
       setIsLoggedIn(false);
       router.push('/login');
     }
-  }, [sessions.length, router, fetchMessagesForSession, setSessions, setActiveSessionId, setIsLoggedIn]); // Dependencies for useCallback
+  }, [sessions.length, router, fetchMessagesForSession, setSessions, setActiveSessionId, setIsLoggedIn]);
 
   const fetchStreamedData = async (userMessage: string) => {
     if (!activeSession) {
@@ -153,7 +149,7 @@ export default function ChatPage() {
         if (errorData.message === 'Token expired') {
           localStorage.removeItem('token');
           setIsLoggedIn(false);
-          router.push('/login?message=expired'); // Redirect with expired message
+          router.push('/login?message=expired');
         } else {
           localStorage.removeItem('token');
           setIsLoggedIn(false);
@@ -202,7 +198,6 @@ export default function ChatPage() {
       }
     } catch (error) {
       console.error('Error fetching streamed data:', error);
-      // Handle network errors or other client-side error happens before 401 response
       localStorage.removeItem('token');
       setIsLoggedIn(false);
       router.push('/login');
@@ -215,15 +210,14 @@ export default function ChatPage() {
     router.push('/login');
   };
 
-  // Function to show modal and set initial editing title
   const showEditModal = () => {
     if (activeSession) {
       setEditingTitle(activeSession.title);
     }
-    setIsModalVisible(true);
+    setIsEditModalVisible(true);
   };
 
-  const handleOk = async () => {
+  const handleEditOk = async () => {
     if (!activeSession) return;
     const token = localStorage.getItem('token');
     if (!token) {
@@ -243,13 +237,12 @@ export default function ChatPage() {
 
       if (response.ok) {
         const updatedSession = await response.json();
-        // Update sessions state with the new title
         setSessions((prevSessions) =>
           prevSessions.map((s) =>
             s.id === updatedSession.id ? { ...s, title: updatedSession.title } : s
           )
         );
-        setIsModalVisible(false);
+        setIsEditModalVisible(false);
       } else if (response.status === 401) {
         const errorData = await response.json();
         if (errorData.message === 'Token expired') {
@@ -261,8 +254,6 @@ export default function ChatPage() {
           setIsLoggedIn(false);
           router.push('/login');
         }
-      } else {
-        console.error('Failed to update session title', response.statusText);
       }
     } catch (error) {
       console.error('Error updating session title:', error);
@@ -272,11 +263,10 @@ export default function ChatPage() {
     }
   };
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
+  const handleEditCancel = () => {
+    setIsEditModalVisible(false);
   };
 
-  // Fetch sessions on component mount and handle authentication
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -308,18 +298,15 @@ export default function ChatPage() {
           if (errorData.message === 'Token expired') {
             localStorage.removeItem('token');
             setIsLoggedIn(false);
-            router.push('/login?message=expired'); // Redirect with expired message
+            router.push('/login?message=expired');
           } else {
             localStorage.removeItem('token');
             setIsLoggedIn(false);
             router.push('/login');
           }
-        } else {
-          console.error('Failed to fetch sessions', response.statusText);
         }
       } catch (error) {
         console.error('Error fetching sessions:', error);
-        // It's possible a network error or other client-side error happens before 401 response
         localStorage.removeItem('token');
         setIsLoggedIn(false);
         router.push('/login');
@@ -327,9 +314,8 @@ export default function ChatPage() {
     };
 
     fetchSessions();
-  }, [router, createNewSessionBackend, setIsLoggedIn]); // Add setIsLoggedIn to dependencies
+  }, [router, createNewSessionBackend, setIsLoggedIn]);
 
-  // Scroll to the bottom whenever messages in the active session change
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
@@ -343,105 +329,45 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex h-screen">
-      {/* Sidebar */}
-      <aside
-        className={`bg-gray-100 transition-all duration-300 ${isSidebarOpen ? 'w-64 p-4' : 'w-0 p-0 overflow-hidden'}`}
-      >
-        <h2 className="text-xl font-semibold mb-4">Sessions</h2>
-        <div className="flex-1 overflow-y-auto">
-          <List
-            dataSource={sessions}
-            renderItem={(session) => (
-              <List.Item
-                key={session.id}
-                className={`${activeSessionId === session.id ? 'bg-blue-300 text-white' : 'hover:bg-gray-200'}`}
-                style={{ cursor: 'pointer', padding: '8px 12px', borderRadius: '4px' }}
-                onClick={async () => {
-                  setActiveSessionId(session.id);
-                  const token = localStorage.getItem('token');
-                  if (token) {
-                    const fetchedMessages = await fetchMessagesForSession(session.id, token);
-                    setSessions((prevSessions) =>
-                      prevSessions.map((s) =>
-                        s.id === session.id ? { ...s, messages: fetchedMessages } : s
-                      )
-                    );
-                  }
-                }}
-              >
-                {session.title}
-              </List.Item>
-            )}
-          />
-        </div>
-        <Button
-          type="primary"
-          onClick={async () => {
-            const newSession = await createNewSessionBackend();
-            if (newSession) {
-              const token = localStorage.getItem('token');
-              if (token) {
-                const fetchedMessages = await fetchMessagesForSession(newSession.id, token);
-                setSessions((prevSessions) =>
-                  prevSessions.map((s) =>
-                    s.id === newSession.id ? { ...s, messages: fetchedMessages } : s
-                  )
-                );
-              }
-            }
-          }}
-          style={{ width: '100%', marginTop: '16px' }}
-        >
-          + New Session
-        </Button>
-      </aside>
+    <div className="flex h-screen overflow-hidden">
+      {!isMobile && (
+        <SessionList
+          sessions={sessions}
+          activeSessionId={activeSessionId}
+          setActiveSessionId={setActiveSessionId}
+          fetchMessagesForSession={fetchMessagesForSession}
+          setSessions={setSessions}
+          createNewSessionBackend={createNewSessionBackend}
+          isMobile={isMobile}
+          isModalVisible={isModalVisible}
+          setIsModalVisible={setIsModalVisible}
+        />
+      )}
 
-      {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="bg-white p-4 flex items-center justify-between">
-          <div className="flex items-center">
-            <Button
-              type="text"
-              icon={isSidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              style={{ marginRight: '16px' }}
-            />
-            <h1 className="text-xl font-semibold mb-0 mt-0"> {/* Add mb-0 and mt-0 to remove vertical margins */}
-              {activeSession ? activeSession.title : 'Loading...'}
-            </h1>
-            {activeSession && (
-              <Button
-                type="text"
-                icon={<EditOutlined />}
-                onClick={showEditModal}
-                style={{ marginLeft: '8px' }}
-              />
-            )}
-          </div>
-          {isLoggedIn ? (
-            <Button type="primary" danger onClick={handleLogout}>
-              Logout
-            </Button>
-          ) : (
-            <Button type="primary" onClick={() => router.push('/login')}>
-              Login
-            </Button>
-          )}
-        </header>
+        <HeaderBar
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
+          activeSession={activeSession}
+          showEditModal={showEditModal}
+          isLoggedIn={isLoggedIn}
+          handleLogout={handleLogout}
+          router={router}
+          isMobile={isMobile}
+          onShowMobileSessionList={() => setIsModalVisible(true)}
+        />
 
         {/* Edit Title Modal */}
         <Modal
           title="Edit Session Title"
-          open={isModalVisible}
-          onOk={handleOk}
-          onCancel={handleCancel}
+          open={isEditModalVisible}
+          onOk={handleEditOk}
+          onCancel={handleEditCancel}
           footer={[
-            <Button key="back" onClick={handleCancel}>
+            <Button key="back" onClick={handleEditCancel}>
               Cancel
             </Button>,
-            <Button key="submit" type="primary" onClick={handleOk}>
+            <Button key="submit" type="primary" onClick={handleEditOk}>
               OK
             </Button>,
           ]}
@@ -453,44 +379,30 @@ export default function ChatPage() {
           />
         </Modal>
 
-        {/* Message Area */}
-        <div className="flex-1 p-4 overflow-y-auto bg-gray-50 flex flex-col" ref={messagesEndRef}>
-          {(activeSession?.messages || []).map((msg, index) => (
-            <div
-              key={index}
-              className={`mb-2 p-2 rounded shadow-sm ${msg.sender === 'user' ? 'bg-blue-100 self-end' : 'bg-white self-start'}`}
-              style={{ maxWidth: '70%', marginLeft: msg.sender === 'user' ? 'auto' : 'unset' }}
-            >
-              <ReactMarkdown
-                components={{
-                  p: ({ ...props }) => <p style={{ margin: '0px' }} {...props} />,
-                }}
-              >
-                {msg.content}
-              </ReactMarkdown>
-            </div>
-          ))}
-        </div>
+        <ContentBox
+          activeSessionMessages={activeSession?.messages || []}
+          messagesEndRef={messagesEndRef}
+        />
 
-        {/* Input Box */}
-        <div className="p-4 bg-gray-200 flex">
-          <Input.TextArea
-            placeholder="Type your message..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onPressEnter={(e) => {
-              if (e.shiftKey) return; // Allow shift + enter for new line
-              e.preventDefault(); // Prevent default new line
-              handleSendMessage();
-            }}
-            autoSize={{ minRows: 1, maxRows: 5 }}
-            style={{ marginRight: '8px' }}
-          />
-          <Button type="primary" onClick={handleSendMessage}>
-            Send
-          </Button>
-        </div>
+        <InputBox
+          input={input}
+          setInput={setInput}
+          handleSendMessage={handleSendMessage}
+        />
       </div>
+      {isMobile && (
+        <SessionList
+          sessions={sessions}
+          activeSessionId={activeSessionId}
+          setActiveSessionId={setActiveSessionId}
+          fetchMessagesForSession={fetchMessagesForSession}
+          setSessions={setSessions}
+          createNewSessionBackend={createNewSessionBackend}
+          isMobile={isMobile}
+          isModalVisible={isModalVisible}
+          setIsModalVisible={setIsModalVisible}
+        />
+      )}
     </div>
   );
 }
