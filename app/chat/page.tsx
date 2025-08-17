@@ -342,7 +342,6 @@ export default function ChatPage() {
           isModalVisible={isModalVisible}
           setIsModalVisible={setIsModalVisible}
           isSidebarOpen={isSidebarOpen}
-          setIsSidebarOpen={setIsSidebarOpen}
         />
       )}
 
@@ -404,7 +403,6 @@ export default function ChatPage() {
           isModalVisible={isModalVisible}
           setIsModalVisible={setIsModalVisible}
           isSidebarOpen={isSidebarOpen}
-          setIsSidebarOpen={setIsSidebarOpen}
         />
       )}
     </div>
