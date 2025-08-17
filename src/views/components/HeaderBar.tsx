@@ -27,8 +27,8 @@ export default function HeaderBar({
   onShowMobileSessionList,
 }: HeaderBarProps) {
   return (
-    <header className="bg-white p-4 flex items-center justify-between shadow-md">
-      <div className="flex items-center">
+    <header className="bg-white p-4 sm:p-2 flex items-center justify-between shadow-md">
+      <div className="flex items-center flex-shrink-0">
         {isMobile ? (
           <Button
             type="text"
@@ -57,11 +57,11 @@ export default function HeaderBar({
         )}
       </div>
       {isLoggedIn ? (
-        <Button type="primary" danger onClick={handleLogout} className="text-sm px-2 py-1"> {/* Added compact styles */}
+        <Button type="primary" danger onClick={handleLogout} className="text-sm px-2 py-1 flex-shrink-0"> {/* Added compact styles and flex-shrink-0 */}
           Logout
         </Button>
       ) : (
-        <Button type="primary" onClick={() => router.push('/login')} className="text-sm px-2 py-1"> {/* Added compact styles */}
+        <Button type="primary" onClick={() => router.push('/login')} className="text-sm px-2 py-1 flex-shrink-0"> {/* Added compact styles and flex-shrink-0 */}
           Login
         </Button>
       )}
