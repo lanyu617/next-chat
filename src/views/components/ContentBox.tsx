@@ -15,13 +15,13 @@ export default function ContentBox({
     <div
       className="flex-1 p-4 overflow-y-auto bg-gray-50 flex flex-col"
       ref={messagesEndRef}
-      style={{ maxWidth: '100%', margin: '0 auto' }} // Added for mobile responsiveness
+      style={{ maxWidth: '100%', margin: '0 auto', overflowX: 'hidden' }} // Added overflowX: 'hidden'
     >
       {(activeSessionMessages || []).map((msg, index) => (
         <div
           key={index}
           className={`mb-2 p-2 rounded shadow-sm ${msg.sender === 'user' ? 'bg-blue-100 self-end' : 'bg-white self-start'}`}
-          style={{ maxWidth: '90%', marginLeft: msg.sender === 'user' ? 'auto' : 'unset' }} // Adjusted max-width for mobile
+          style={{ width: 'fit-content', maxWidth: '90%', marginLeft: msg.sender === 'user' ? 'auto' : 'unset', wordBreak: 'break-word' }} // Changed maxWidth to width: 'fit-content' and added wordBreak
         >
           <ReactMarkdown
             components={{

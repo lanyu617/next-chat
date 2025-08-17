@@ -44,7 +44,7 @@ export default function HeaderBar({
             style={{ marginRight: '16px' }}
           />
         )}
-        <h1 className="text-xl font-semibold mb-0 mt-0">
+        <h1 className="text-xl font-semibold mb-0 mt-0 flex-1 min-w-0 truncate"> {/* Add flex-1, min-w-0, truncate */}
           {activeSession ? activeSession.title : 'Loading...'}
         </h1>
         {activeSession && (
@@ -52,16 +52,16 @@ export default function HeaderBar({
             type="text"
             icon={<EditOutlined />}
             onClick={showEditModal}
-            style={{ marginLeft: '8px' }}
+            className="ml-2" // Replaced inline style
           />
         )}
       </div>
       {isLoggedIn ? (
-        <Button type="primary" danger onClick={handleLogout}>
+        <Button type="primary" danger onClick={handleLogout} className="text-sm px-2 py-1"> {/* Added compact styles */}
           Logout
         </Button>
       ) : (
-        <Button type="primary" onClick={() => router.push('/login')}>
+        <Button type="primary" onClick={() => router.push('/login')} className="text-sm px-2 py-1"> {/* Added compact styles */}
           Login
         </Button>
       )}
