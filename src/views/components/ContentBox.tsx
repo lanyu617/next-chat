@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Message } from '@/src/types/chat';
+import CodeBlock from './CodeBlock';
 
 interface ContentBoxProps {
   activeSessionMessages: Message[];
@@ -35,6 +36,29 @@ export default function ContentBox({
             <ReactMarkdown
               components={{
                 p: ({ ...props }) => <p style={{ margin: '0px' }} {...props} />,
+                code: ({ className, children, ...props }) => {
+                  const match = /language-(\w+)/.exec(className || '');
+                  const isInline = !match;
+                  
+                  if (isInline) {
+                    // 行内代码
+                    return (
+                      <code
+                        className="bg-gray-200 text-gray-800 px-1 py-0.5 rounded text-sm font-mono"
+                        {...props}
+                      >
+                        {children}
+                      </code>
+                    );
+                  }
+                  
+                  // 代码块
+                  return (
+                    <CodeBlock className={className}>
+                      {String(children).replace(/\n$/, '')}
+                    </CodeBlock>
+                  );
+                },
               }}
             >
               {msg.content}
