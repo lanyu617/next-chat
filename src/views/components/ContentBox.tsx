@@ -44,7 +44,7 @@ export default function ContentBox({
                     // 行内代码
                     return (
                       <code
-                        className="bg-gray-200 text-gray-800 px-1 py-0.5 rounded text-sm font-mono"
+                        className="bg-gray-100 text-gray-800 px-2 py-1 rounded text-sm font-mono border border-gray-200"
                         {...props}
                       >
                         {children}

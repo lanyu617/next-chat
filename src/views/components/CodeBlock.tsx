@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { vs } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { CopyOutlined, CheckOutlined } from '@ant-design/icons';
 import { Button, message } from 'antd';
 
@@ -78,18 +78,18 @@ export default function CodeBlock({ children, className }: CodeBlockProps) {
   };
 
   return (
-    <div className="my-4 rounded-lg overflow-hidden border border-gray-200 bg-[#1e1e1e]">
+    <div className="my-4 rounded-lg overflow-hidden border border-gray-300 bg-white shadow-sm">
       {/* 代码块头部栏 */}
-      <div className="flex items-center justify-between px-4 py-2 bg-[#2d2d30] border-b border-gray-600">
+      <div className="flex items-center justify-between px-4 py-2 bg-gray-50 border-b border-gray-200">
         <div className="flex items-center space-x-2">
           {/* 语言标签 */}
           <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 rounded-full bg-red-500"></div>
-            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+            <div className="w-3 h-3 rounded-full bg-red-400"></div>
+            <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+            <div className="w-3 h-3 rounded-full bg-green-400"></div>
           </div>
           {language && (
-            <span className="text-gray-300 text-sm font-medium ml-2">
+            <span className="text-gray-700 text-sm font-medium ml-2">
               {displayLanguage}
             </span>
           )}
@@ -101,7 +101,7 @@ export default function CodeBlock({ children, className }: CodeBlockProps) {
           size="small"
           icon={copied ? <CheckOutlined /> : <CopyOutlined />}
           onClick={handleCopy}
-          className="text-gray-300 hover:text-white hover:bg-gray-600 border-none"
+          className="text-gray-600 hover:text-gray-800 hover:bg-gray-200 border-none"
           title="复制代码"
         >
           {copied ? '已复制' : '复制'}
@@ -112,21 +112,21 @@ export default function CodeBlock({ children, className }: CodeBlockProps) {
       <div className="relative">
         <SyntaxHighlighter
           language={language}
-          style={vscDarkPlus}
+          style={vs}
           customStyle={{
             margin: 0,
             padding: '16px',
-            background: '#1e1e1e',
+            background: '#ffffff',
             fontSize: '14px',
             lineHeight: '1.5',
           }}
           showLineNumbers={true}
           lineNumberStyle={{
-            color: '#6e7681',
+            color: '#999999',
             fontSize: '12px',
             paddingRight: '16px',
             marginRight: '16px',
-            borderRight: '1px solid #30363d',
+            borderRight: '1px solid #e5e5e5',
           }}
           wrapLines={true}
           wrapLongLines={true}
