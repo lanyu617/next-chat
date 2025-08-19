@@ -88,11 +88,11 @@ export default function ChatPage() {
       if (response.ok) {
         const newSession = await response.json();
         const fetchedMessages = await fetchMessagesForSession(newSession.id, token);
-        const sessionWithMessages = { ...newSession, messages: fetchedMessages };
+        const sessionWithMessages = { ...newSession, messages: fetchedMessages || [] };
 
         setSessions((prevSessions) => [...prevSessions, sessionWithMessages]);
         setActiveSessionId(newSession.id);
-        return newSession;
+        return sessionWithMessages;
       } else if (response.status === 401) {
         const errorData = await response.json();
         if (errorData.message === 'Token expired') {
@@ -165,7 +165,7 @@ export default function ChatPage() {
     setSessions((prevSessions) =>
       prevSessions.map((s) =>
         s.id === activeSessionId
-          ? { ...s, messages: [...s.messages, newUserMessage] }
+          ? { ...s, messages: [...(s.messages || []), newUserMessage] }
           : s
       )
     );
@@ -210,7 +210,7 @@ export default function ChatPage() {
       setSessions((prevSessions) =>
         prevSessions.map((s) =>
           s.id === activeSessionId
-            ? { ...s, messages: [...s.messages, { sender: 'bot', content: '' }] }
+            ? { ...s, messages: [...(s.messages || []), { sender: 'bot', content: '' }] }
             : s
         )
       );
@@ -227,8 +227,8 @@ export default function ChatPage() {
             s.id === activeSessionId
               ? {
                   ...s,
-                  messages: s.messages.map((msg, index) =>
-                    index === s.messages.length - 1
+                  messages: (s.messages || []).map((msg, index) =>
+                    index === (s.messages || []).length - 1
                       ? { ...msg, content: accumulatedResponse }
                       : msg
                   ),
@@ -328,9 +328,22 @@ export default function ChatPage() {
 
         if (response.ok) {
           const data = await response.json();
-          setSessions(data);
-          if (data.length > 0) {
-            setActiveSessionId(data[0].id);
+          // Ensure all sessions have messages array initialized
+          const sessionsWithMessages = data.map((session: any) => ({
+            ...session,
+            messages: session.messages || []
+          }));
+          setSessions(sessionsWithMessages);
+          if (sessionsWithMessages.length > 0) {
+            const firstSession = sessionsWithMessages[0];
+            setActiveSessionId(firstSession.id);
+            // 自动加载第一个会话的消息
+            const fetchedMessages = await fetchMessagesForSession(firstSession.id, token);
+            setSessions((prevSessions) =>
+              prevSessions.map((s) =>
+                s.id === firstSession.id ? { ...s, messages: fetchedMessages || [] } : s
+              )
+            );
           } else {
             await createNewSessionBackend();
           }

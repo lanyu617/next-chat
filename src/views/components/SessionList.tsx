@@ -37,7 +37,7 @@ export default function SessionList({
       const fetchedMessages = await fetchMessagesForSession(session.id, token);
       setSessions((prevSessions) =>
         prevSessions.map((s) =>
-          s.id === session.id ? { ...s, messages: fetchedMessages } : s
+          s.id === session.id ? { ...s, messages: fetchedMessages || [] } : s
         )
       );
     }
@@ -54,7 +54,7 @@ export default function SessionList({
         const fetchedMessages = await fetchMessagesForSession(newSession.id, token);
         setSessions((prevSessions) =>
           prevSessions.map((s) =>
-            s.id === newSession.id ? { ...s, messages: fetchedMessages } : s
+            s.id === newSession.id ? { ...s, messages: fetchedMessages || [] } : s
           )
         );
       }
