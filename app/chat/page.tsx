@@ -329,7 +329,7 @@ export default function ChatPage() {
         if (response.ok) {
           const data = await response.json();
           // Ensure all sessions have messages array initialized
-          const sessionsWithMessages = data.map((session: any) => ({
+          const sessionsWithMessages = data.map((session: Omit<Session, 'messages'> & { messages?: Message[] }) => ({
             ...session,
             messages: session.messages || []
           }));
@@ -368,7 +368,7 @@ export default function ChatPage() {
     };
 
     fetchSessions();
-  }, [router, createNewSessionBackend, setIsLoggedIn]);
+  }, [router, createNewSessionBackend, setIsLoggedIn, fetchMessagesForSession]);
 
   useEffect(() => {
     if (messagesEndRef.current) {
