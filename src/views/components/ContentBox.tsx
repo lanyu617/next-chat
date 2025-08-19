@@ -36,6 +36,18 @@ export default function ContentBox({
             <ReactMarkdown
               components={{
                 p: ({ ...props }) => <p style={{ margin: '0px' }} {...props} />,
+                hr: ({ ...props }) => (
+                  <hr 
+                    className="my-4 border-t border-gray-300" 
+                    style={{ 
+                      margin: '16px 0',
+                      border: 'none',
+                      borderTop: '1px solid #d1d5db',
+                      width: '100%'
+                    }}
+                    {...props} 
+                  />
+                ),
                 code: ({ className, children, ...props }) => {
                   const match = /language-(\w+)/.exec(className || '');
                   const isInline = !match;
