@@ -34,14 +34,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
     }
 
-    // Generate JWT
-    const token = jwt.sign(
-      { id: user.id, username: user.username },
-      process.env.JWT_SECRET as string,
-      { expiresIn: '1h' } // Token expires in 1 hour
-    );
+  // Generate JWT
+  const token = jwt.sign(
+    { id: user.id, username: user.username },
+    process.env.JWT_SECRET as string,
+    { expiresIn: '1h' } // Token expires in 1 hour
+  );
 
-    return NextResponse.json({ message: 'Login successful', token }, { status: 200 });
+  // 创建响应并设置 HTTP-only Cookie
+  const response = NextResponse.json({ message: 'Login successful', user: { id: user.id, username: user.username } }, { status: 200 });
+  
+  // 设置 HTTP-only Cookie
+  response.cookies.set('auth-token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 60 * 60, // 1 hour
+    path: '/',
+  });
+
+  return response;
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
